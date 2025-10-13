@@ -14,9 +14,8 @@ class TestDiscriminant(unittest.TestCase):
         self.assertEqual(calculate_discriminant(1, 2, 1), 0)
 
     def test_negative_discriminant(self):
-        # Тест для случая, когда дискриминант меньше нуля
         self.assertEqual(calculate_discriminant(1, 1, 1), -3)
+
 
 if __name__ == "__main__":
     unittest.main()
-
