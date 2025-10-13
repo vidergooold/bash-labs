@@ -1,4 +1,3 @@
-unittest
 flake8
 coverage
 bandit
