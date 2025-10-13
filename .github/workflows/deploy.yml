@@ -1,0 +1,57 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: Run tests
+      run: |
+        python -m unittest test_discriminant.py
+
+    - name: Run flake8
+      run: |
+        pip install flake8
+        flake8 .
+
+    - name: Run coverage
+      run: |
+        pip install coverage
+        coverage run -m unittest test_discriminant.py
+        coverage report
+
+    - name: Run bandit security checks
+      run: |
+        pip install bandit
+        bandit -r .
+
+    - name: Send Telegram notification
+      uses: peter-evans/telegram-notify@v1
+      with:
+        token: ${{ secrets.TELEGRAM_TOKEN }}
+        chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
+        message: |
+          CI/CD Pipeline completed: ${{ job.status }}
+
