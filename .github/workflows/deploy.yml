@@ -34,7 +34,7 @@ jobs:
     - name: Run flake8
       run: |
         pip install flake8
-        flake8 .
+        flake8 . --exclude=.history
 
     - name: Run coverage
       run: |

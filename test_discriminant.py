@@ -2,6 +2,7 @@
 import unittest
 from discriminant import calculate_discriminant
 
+
 class TestDiscriminant(unittest.TestCase):
 
     def test_positive_discriminant(self):
