@@ -48,10 +48,11 @@ jobs:
         bandit -r .
 
     - name: Send Telegram notification
-      uses: peter-evans/telegram-notify@v1
+      uses: appleboy/telegram-action@master
       with:
+        to: ${{ secrets.TELEGRAM_CHAT_ID }}
         token: ${{ secrets.TELEGRAM_TOKEN }}
-        chat_id: ${{ secrets.TELEGRAM_CHAT_ID }}
         message: |
-          CI/CD Pipeline completed: ${{ job.status }}
+          CI/CD Pipeline completed with status: ${{ job.status }}
+
 
