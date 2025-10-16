@@ -48,20 +48,11 @@ jobs:
         bandit -r .
 
     - name: Send Telegram notification
+      if: always()
       uses: appleboy/telegram-action@master
       with:
         to: ${{ secrets.TELEGRAM_CHAT_ID }}
         token: ${{ secrets.TELEGRAM_TOKEN }}
         message: |
-          Проект: ${{ github.repository }}
-          Автор: ${{ github.actor }}
-          Время: ${{ github.run_started_at }}
-          Статус пайплайна: ${{ job.status }}
-
-          {% if job.status == 'success' %}
-          Всё прошло успешно!
-          {% else %}
-          Ошибка в пайплайне! Проверь вкладку Actions на GitHub.
-          {% endif %}
-
+          CI/CD Pipeline completed with status: ${{ job.status }}
 
