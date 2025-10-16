@@ -7,7 +7,7 @@ class TestDiscriminant(unittest.TestCase):
 
     def test_positive_discriminant(self):
         # Тест для случая, когда дискриминант больше нуля
-        self.assertEqual(calculate_discriminant(1, -3, 2), 2)
+        self.assertEqual(calculate_discriminant(1, -3, 2), 1)
 
     def test_zero_discriminant(self):
         # Тест для случая, когда дискриминант равен нулю
