@@ -3,6 +3,8 @@ name: Publish Lab4 Website on Release
 on:
   release:
     types: [published]
+    tags:
+      - 'v4.*'
   workflow_dispatch:
 
 permissions:
