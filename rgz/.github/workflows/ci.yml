@@ -1,47 +1,57 @@
-name: CI
+name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
 
 jobs:
-  build-and-test:
+  test:
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: subscriptions_db
-        ports:
-          - "5432:5432"
-        options: >-
-          --health-cmd="pg_isready -U postgres"
-          --health-interval=5s
-          --health-timeout=5s
-          --health-retries=5
-
-    env:
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/subscriptions_db
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
 
-      - name: Run tests
-        run: pytest
+    - name: Run tests
+      run: |
+        python -m unittest test_discriminant.py
 
-      - name: Run bandit
-        run: bandit -r .
+    - name: Run flake8
+      run: |
+        pip install flake8
+        flake8 . --exclude=.history
+
+    - name: Run coverage
+      run: |
+        pip install coverage
+        coverage run -m unittest test_discriminant.py
+        coverage report
+
+    - name: Run bandit security checks
+      run: |
+        pip install bandit
+        bandit -r .
+
+    - name: Send Telegram notification
+      if: always()
+      uses: appleboy/telegram-action@master
+      with:
+        to: ${{ secrets.TELEGRAM_CHAT_ID }}
+        token: ${{ secrets.TELEGRAM_TOKEN }}
+        message: |
+          CI/CD Pipeline completed with status: ${{ job.status }}
