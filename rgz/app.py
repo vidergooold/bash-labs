@@ -2,12 +2,16 @@
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 
 from database import SessionLocal, engine, Base
 from models import User, Subscription, AuditLog
 
 app = Flask(__name__)
+
+@app.route("/")
+def index():
+    return render_template("subscriptions.html")
 
 
 def init_db():
@@ -71,14 +75,14 @@ def create_subscription():
         return jsonify({"error": "amount должен быть числом"}), 400
 
     try:
-        start_date = datetime.strptime(start_date_raw, "%Y-%m-%d").date()
+        start_date = datetime.strptime(start_date_raw, "%Y-%m-%d").date()  # Исправлено: добавляем .date()
     except ValueError:
         return jsonify({"error": "start_date в формате YYYY-MM-DD"}), 400
 
     next_charge_date = None
     if next_charge_raw:
         try:
-            next_charge_date = datetime.strptime(next_charge_raw, "%Y-%m-%d").date()
+            next_charge_date = datetime.strptime(next_charge_raw, "%Y-%m-%d").date()  # Исправлено: добавляем .date()
         except ValueError:
             return jsonify({"error": "next_charge_date в формате YYYY-MM-DD"}), 400
 
@@ -155,7 +159,7 @@ def update_subscription(sub_id: int):
                 sub.next_charge_date = None
             else:
                 try:
-                    sub.next_charge_date = datetime.strptime(raw, "%Y-%m-%d").date()
+                    sub.next_charge_date = datetime.strptime(raw, "%Y-%m-%d").date()  # Исправлено: добавляем .date()
                 except ValueError:
                     return jsonify({"error": "next_charge_date в формате YYYY-MM-DD"}), 400
 
@@ -181,12 +185,11 @@ def delete_subscription(sub_id: int):
         if not sub:
             return jsonify({"error": "Подписка не найдена"}), 404
 
-        # логическое удаление
         sub.active = False
         log_action(db, user_id=user_id, action="delete", subscription_id=sub.id)
 
         db.commit()
-        return jsonify({"message": "Подписка удалена"})
+        return jsonify({"status": "deleted"})
     finally:
         db.close()
 

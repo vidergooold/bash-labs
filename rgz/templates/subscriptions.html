@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Подписки</title>
+    <style>
+        body { font-family: Arial; background: #f4f6f8; padding: 20px; }
+        .card { background: white; padding: 15px; margin: 10px 0; border-radius: 8px; }
+        button { margin-right: 5px; }
+    </style>
+</head>
+<body>
+
+<h1>Мои подписки</h1>
+
+<h3>Добавить подписку</h3>
+<input id="name" placeholder="Название">
+<input id="amount" type="number" placeholder="Цена">
+<select id="period">
+    <option value="">-- период --</option>
+    <option value="monthly">monthly</option>
+    <option value="yearly">yearly</option>
+</select>
+<input id="start_date" type="date">
+<button onclick="createSub()">Создать</button>
+
+
+<h3>Список</h3>
+<div id="list"></div>
+
+<script>
+async function createSub() {
+    if (!name.value || !amount.value || !period.value || !start_date.value) {
+        alert("Заполните все поля");
+        return;
+    }
+
+    const res = await fetch("/subscriptions", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            name: name.value,
+            amount: amount.value,
+            period: period.value,
+            start_date: start_date.value
+        })
+    });
+
+    if (!res.ok) {
+        const err = await res.json();
+        alert(err.error || "Ошибка создания подписки");
+        return;
+    }
+
+    name.value = "";
+    amount.value = "";
+    start_date.value = "";
+    period.value = "";
+
+    loadSubs();
+}
+</script>
+
+
+</body>
+</html>
